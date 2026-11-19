@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>みんなのミネラル石けん部</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#d6d0f4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="石けん部">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+html,body{height:100%;margin:0;overscroll-behavior:none;touch-action:manipulation;background:#cfc8ee}
+body{display:flex;justify-content:center;font-family:"Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN",sans-serif}
+#app{position:relative;width:100%;max-width:480px;height:100%;overflow:hidden;background:#d6d0f4}
+.screen{position:absolute;inset:0;background-repeat:no-repeat;background-size:cover}
+
+/* ===== スタート画面 ===== */
+#title{z-index:2;background-image:url(title-bg.jpg);background-position:center;cursor:pointer;transition:opacity .6s ease}
+#title.out{opacity:0;pointer-events:none}
+#logo{position:absolute;left:50%;top:calc(11% + env(safe-area-inset-top,0px));width:min(92%,430px);height:auto;transform:translateX(-50%);animation:sway 4.8s ease-in-out infinite;pointer-events:none}
+@keyframes sway{0%,100%{transform:translateX(-50%) translateY(0) rotate(-1.2deg)}50%{transform:translateX(-50%) translateY(-5px) rotate(1.2deg)}}
+#tap{position:absolute;left:50%;bottom:calc(11% + env(safe-area-inset-bottom,0px));width:min(80%,340px);height:auto;transform:translateX(-50%);animation:blink 1.5s ease-in-out infinite;pointer-events:none}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ===== ホーム画面 ===== */
+#home{z-index:1;background-image:url(home-bg.jpg);background-position:center bottom}
+#chara{position:absolute;left:50%;bottom:calc(7% + env(safe-area-inset-bottom,0px));height:min(66%,720px);transform:translateX(-50%);opacity:0;transition:opacity .9s ease .25s}
+#chara img{display:block;height:100%;width:auto}
+#chara::before{content:"";position:absolute;left:50%;bottom:-1.2%;width:70%;height:3.2%;transform:translateX(-50%);border-radius:50%;background:rgba(70,50,60,.28);filter:blur(5px)}
+#home.show #chara{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="home" class="screen"><div id="chara"><img id="charaImg" alt="default" src="default.webp"></div></div>
+  <div id="title" class="screen">
+    <img id="logo" src="logo.webp" alt="みんなのミネラル石けん部">
+    <img id="tap" src="tap.webp" alt="TAP TO START">
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+/* ===== キャラ(ホームに表示する子)。ガチャで増やすときはここに足す ===== */
+const CHARAS = { default: { name: "default", img: "default.webp" } };
+function showChara(id){ const c = CHARAS[id] || CHARAS.default; $("charaImg").src = c.img; $("charaImg").alt = c.name; }
+let homeChara = "default";
+try { homeChara = localStorage.getItem("home-chara") || "default"; } catch(e) {}
+showChara(homeChara);
+
+/* ===== 起動(画面のどこを押しても始まる) ===== */
+let started = false;
+function startApp(){
+  if (started) return; started = true;
+  $("title").classList.add("out"); $("home").classList.add("show");
+  setTimeout(() => { $("title").style.display = "none"; }, 700);
+}
+$("title").addEventListener("click", startApp);
+
+/* ===== 音(BGM・クリック音) ===== */
+const AUD = {ctx:null, started:false, bgm:null, bgmGain:null, sfxGain:null, bgmVol:0.7, sfxVol:0.8};
+function playBgm(){ if (!AUD.bgm || AUD.bgmVol <= 0) return; const r = AUD.bgm.play(); if (r && r.catch) r.catch(() => {}); }
+function unlockAudio(){   // iPhoneは最初のタップまで音を出せない。タップのたびに呼ぶ
+  if (!AUD.started) {
+    AUD.started = true;
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch(e) {}
+    const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+    const ctx = AUD.ctx = new C();
+    AUD.bgmGain = ctx.createGain(); AUD.sfxGain = ctx.createGain();
+    AUD.bgmGain.gain.value = AUD.bgmVol; AUD.sfxGain.gain.value = AUD.sfxVol;
+    AUD.bgmGain.connect(ctx.destination); AUD.sfxGain.connect(ctx.destination);
+    const el = AUD.bgm = new Audio("bgm.mp3"); el.loop = true; el.preload = "auto";
+    try { ctx.createMediaElementSource(el).connect(AUD.bgmGain); } catch(e) {}
+  }
+  if (AUD.ctx && AUD.ctx.state === "suspended") AUD.ctx.resume();
+  if (AUD.bgm && AUD.bgm.paused && !document.hidden) playBgm();
+}
+let noiseB = null;
+function noiseHit(t, dur, type, freq, gain, q){
+  const ctx = AUD.ctx;
+  if (!noiseB) { const n = ctx.sampleRate, b = ctx.createBuffer(1, n, ctx.sampleRate), d = b.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; noiseB = b; }
+  const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+  s.buffer = noiseB; f.type = type; f.frequency.value = freq; if (q) f.Q.value = q;
+  g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(AUD.sfxGain); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.01);
+}
+function tone(t, f0, f1, dur, gain, type){
+  const ctx = AUD.ctx, o = ctx.createOscillator(), g = ctx.createGain(); o.type = type || "sine";
+  o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur * 0.8);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(AUD.sfxGain); o.start(t); o.stop(t + dur + 0.02);
+}
+// 茶軸(タクタイル)風: 軽い引っかかり → 底打ちの「コトッ」→ 離すときの小さな「カチ」
+function keyDown(){
+  if (!AUD.ctx || AUD.sfxVol <= 0) return;
+  const t = AUD.ctx.currentTime, v = 0.94 + Math.random() * 0.12;
+  noiseHit(t, 0.010, "bandpass", 3400 * v, 0.28, 1.4);
+  tone(t + 0.012, 240 * v, 100 * v, 0.075, 0.85, "sine");
+  noiseHit(t + 0.012, 0.035, "lowpass", 1700 * v, 0.55);
+  tone(t + 0.012, 1250 * v, 700 * v, 0.02, 0.07, "triangle");
+}
+function keyUp(){
+  if (!AUD.ctx || AUD.sfxVol <= 0) return;
+  const t = AUD.ctx.currentTime, v = 0.94 + Math.random() * 0.12;
+  noiseHit(t, 0.014, "bandpass", 2600 * v, 0.2, 1.1);
+  tone(t, 330 * v, 190 * v, 0.03, 0.22, "sine");
+}
+const KEYSEL = "button, [data-click], #title";   // クリック音を鳴らす場所
+const isKey = e => e.target.closest && e.target.closest(KEYSEL) && !e.target.closest("button:disabled");
+document.addEventListener("pointerdown", e => { unlockAudio(); if (isKey(e)) keyDown(); }, true);
+document.addEventListener("pointerup", e => { if (isKey(e)) keyUp(); }, true);
+document.addEventListener("touchend", unlockAudio, true);
+document.addEventListener("click", unlockAudio, true);
+document.addEventListener("visibilitychange", () => {
+  if (!AUD.ctx) return;
+  if (document.hidden) { if (AUD.bgm) AUD.bgm.pause(); AUD.ctx.suspend(); } else { AUD.ctx.resume(); playBgm(); }
+});
+
+/* 先読み(切り替え時に画像が遅れて出ないように) */
+["home-bg.jpg", "default.webp"].forEach(src => { const i = new Image(); i.src = src; });
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
