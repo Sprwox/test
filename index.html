@@ -51,6 +51,94 @@ body{display:flex;justify-content:center;font-family:"M PLUS Rounded 1c","Hiragi
 #rcol{position:absolute;right:6px;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px}
 #toast{position:absolute;left:50%;top:calc(78px + env(safe-area-inset-top,0px));transform:translate(-50%,-6px);padding:9px 18px;border-radius:999px;background:rgba(255,255,255,.93);color:#5560c8;font-weight:800;font-size:14px;white-space:nowrap;border:2px solid #b9c0f2;box-shadow:0 4px 10px rgba(110,120,210,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:5}
 #toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ===== Todoページ(やわらかいパステル・ポップ) ===== */
+#todo{z-index:10;display:none;flex-direction:column;background:rgba(246,241,255,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#4b4fa0;opacity:0;transform:scale(.97);transition:opacity .25s ease,transform .35s cubic-bezier(.2,1.3,.4,1)}
+#todo.open{display:flex}
+#todo.on{opacity:1;transform:none}
+#todo button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;-webkit-appearance:none;appearance:none;transition:transform .1s ease}
+#todo button:active{transform:scale(.93)}
+#todo .ic{width:24px;height:24px;display:block;flex:none}
+#todo .ic.big{width:38px;height:38px}
+#tHead{flex:none;display:flex;align-items:flex-start;justify-content:space-between;padding:calc(4px + env(safe-area-inset-top,0px)) 12px 0 6px}
+#tTitle{width:150px;height:auto;filter:drop-shadow(0 4px 6px rgba(90,100,170,.25))}
+#tRight{display:flex;align-items:center;gap:6px;margin-top:12px}
+.pill{display:flex;align-items:center;gap:3px;padding:3px 10px 3px 6px;border-radius:999px;background:linear-gradient(#fff,#eeeaff);border:2px solid rgba(150,140,232,.55);font-weight:800;font-size:15px;box-shadow:0 3px 8px rgba(110,100,200,.15)}
+.pill[hidden]{display:none}
+.pill.pop{animation:pillPop .45s cubic-bezier(.2,1.8,.4,1)}
+@keyframes pillPop{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+.xbtn{width:44px;height:44px;border-radius:50%;background:linear-gradient(#fff,#e4e0fa)!important;border:3px solid rgba(150,140,232,.7)!important;display:grid;place-items:center;box-shadow:0 4px 10px rgba(110,100,200,.25)}
+.xbtn .ic{width:22px;height:22px}
+#tMain{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 14px calc(104px + env(safe-area-inset-bottom,0px))}
+.tcard{margin:6px 0 14px;padding:12px 14px 16px;border-radius:30px;background:linear-gradient(rgba(255,255,255,.84),rgba(236,232,252,.8));border:2px solid rgba(150,140,232,.55);box-shadow:0 8px 22px rgba(110,100,200,.2),inset 0 2px 0 rgba(255,255,255,.9)}
+.chead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.chead h2{margin:0;font-size:20px;font-weight:800;flex:1}
+.count{padding:5px 16px;border-radius:999px;background:linear-gradient(#c9bdf7,#a99bf0);color:#fff;font-weight:800;font-size:18px;text-shadow:0 1px 2px rgba(90,80,190,.5)}
+.trow{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:9px 8px 9px 12px;border-radius:22px;background:linear-gradient(#fff,rgba(246,244,255,.92));border:2px solid rgba(170,160,238,.42);box-shadow:0 3px 8px rgba(120,110,200,.12)}
+.trow.new{animation:rowIn .5s cubic-bezier(.2,1.5,.4,1)}
+@keyframes rowIn{0%{transform:scale(.8) translateY(14px);opacity:0}100%{transform:none;opacity:1}}
+.chk{flex:none;width:36px;height:36px;border-radius:50%;border:3px solid #c7c4de!important;background:#fff!important;display:grid;place-items:center;transition:background .2s,border-color .2s}
+.chk .ic{width:20px;height:20px;opacity:0;transform:scale(.3);transition:opacity .15s,transform .35s cubic-bezier(.2,1.9,.4,1)}
+.trow.done .chk{background:linear-gradient(#a7d8ff,#6f94ff)!important;border-color:#5964e0!important}
+.trow.done .chk .ic{opacity:1;transform:scale(1)}
+.chk.pop{animation:chkPop .5s cubic-bezier(.2,1.8,.4,1)}
+@keyframes chkPop{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
+#todo .ttxt{flex:1;min-width:0;text-align:left;font-size:17px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 0}
+.trow.done .ttxt{text-decoration:line-through;opacity:.55}
+.rew{flex:none;display:flex;align-items:center;gap:2px;font-weight:800;font-size:16px;color:#5560c8}
+.rew .ic{width:22px;height:22px}
+.chev{flex:none;width:26px;height:34px;display:grid;place-items:center}
+.chev .ic{width:18px;height:18px}
+.empty{padding:22px 8px 14px;text-align:center;font-weight:500;font-size:15px;line-height:1.7;opacity:.8}
+#todo .addbtn{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px auto 0;padding:12px 28px;border-radius:999px;background:linear-gradient(#b3deff,#6f94ff 85%);border:3px solid #5964e0;color:#fff;font-weight:800;font-size:19px;text-shadow:0 2px 0 #4a55c0,0 0 6px rgba(70,80,200,.45);box-shadow:0 5px 0 #4650b8,0 9px 14px rgba(80,90,200,.28),inset 0 3px 0 rgba(255,255,255,.55)}
+#todo .addbtn:active{transform:translateY(4px);box-shadow:0 1px 0 #4650b8,0 3px 8px rgba(80,90,200,.2),inset 0 3px 0 rgba(255,255,255,.55)}
+#track{position:relative;padding:6px 4px 0}
+#trackLine{position:absolute;left:16.7%;right:16.7%;top:41px;height:12px;margin-top:-6px;border-radius:6px;background:rgba(190,180,240,.5)}
+#trackFill{height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,#a7d8ff,#c4a3ff);transition:width .6s cubic-bezier(.2,1.2,.4,1)}
+#nodes{position:relative;display:grid;grid-template-columns:repeat(3,1fr)}
+.node{display:flex;flex-direction:column;align-items:center;gap:6px}
+#todo .nbub{position:relative;width:68px;height:66px;border-radius:22px;background:linear-gradient(#fff,#e9e5fb);border:3px solid rgba(150,140,232,.55);display:grid;place-items:center;box-shadow:0 4px 10px rgba(110,100,200,.2)}
+#todo .node:not(.ready):not(.got) .nbub{opacity:.78;filter:saturate(.75)}
+#todo .node.ready .nbub{border-color:#f5b02e;animation:nodeReady 1s ease-in-out infinite;box-shadow:0 0 0 4px rgba(255,214,90,.35),0 6px 14px rgba(240,170,40,.35)}
+@keyframes nodeReady{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.06)}}
+#todo .node.got .nbub{background:linear-gradient(#f4f1ff,#e1dcf7)}
+#todo .nbub .ic{width:42px;height:42px}
+.nstar{position:relative;display:grid;place-items:center}
+.nstar em{position:absolute;bottom:-6px;right:-12px;font-style:normal;font-weight:800;font-size:15px;color:#5560c8;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff}
+.ok{position:absolute;right:-9px;top:-9px;width:26px;height:26px;border-radius:50%;background:#6fdc8c;border:2px solid #fff;display:grid;place-items:center}
+#todo .ok .ic{width:15px;height:15px}
+.nlab{font-weight:800;font-size:14px}
+.node.ready .nlab{color:#e08a00}
+#tNav{position:absolute;left:10px;right:10px;bottom:calc(8px + env(safe-area-inset-bottom,0px));height:72px;display:flex;align-items:flex-end;justify-content:space-around;gap:2px;padding:0 6px 6px;border-radius:36px;background:linear-gradient(rgba(255,255,255,.9),rgba(228,222,250,.92));border:2px solid rgba(150,140,232,.55);box-shadow:0 8px 20px rgba(110,100,200,.25),inset 0 2px 0 #fff}
+#todo .ntab{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0 2px;font-size:11px;font-weight:800;color:#6a70c8;white-space:nowrap}
+#todo .ntab .ic{width:30px;height:30px}
+#todo .ntab.act{flex:1.3;transform:translateY(-14px);padding:10px 0 8px;border-radius:30px;background:linear-gradient(#c3e5ff,#82a6ff);border:2px solid #fff;box-shadow:0 6px 14px rgba(90,110,220,.4),inset 0 3px 0 rgba(255,255,255,.6);color:#fff;text-shadow:0 1px 3px #4a55c0;font-size:12px}
+#todo .ntab.act:active{transform:translateY(-12px) scale(.95)}
+#fx{position:absolute;inset:0;pointer-events:none;z-index:6;overflow:hidden}
+.spk{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;animation:spk .75s ease-out forwards}
+.spk.bub{width:11px;height:11px;margin:-5px 0 0 -5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#b9e4ff 60%,#c9b8ff);border:1.5px solid #8fa0f0}
+.spk .ic{width:100%!important;height:100%!important}
+@keyframes spk{0%{transform:translate(0,0) scale(.4);opacity:1}60%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.1) rotate(40deg);opacity:0}}
+.ftxt{position:absolute;transform:translateX(-50%);font-weight:800;font-size:19px;color:#e08a00;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;animation:ftxt .9s ease-out forwards;white-space:nowrap}
+@keyframes ftxt{0%{transform:translate(-50%,0) scale(.6);opacity:0}25%{transform:translate(-50%,-10px) scale(1.2);opacity:1}100%{transform:translate(-50%,-48px) scale(1);opacity:0}}
+#sheetWrap{position:absolute;inset:0;z-index:7;display:none;align-items:flex-end;background:rgba(70,70,140,.3)}
+#sheetWrap.on{display:flex}
+.sheet{width:100%;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));border-radius:32px 32px 0 0;background:linear-gradient(#fff,#efeafc);border:2px solid rgba(150,140,232,.6);border-bottom:0;box-shadow:0 -8px 24px rgba(90,90,190,.25);animation:sheetUp .45s cubic-bezier(.2,1.3,.4,1)}
+@keyframes sheetUp{0%{transform:translateY(60px);opacity:0}100%{transform:none;opacity:1}}
+.sheet h3{margin:0 0 12px;font-size:19px;font-weight:800;text-align:center}
+#sheetInput{width:100%;font:inherit;font-size:18px;font-weight:500;padding:12px 14px;border-radius:18px;border:3px solid #b9b4ec;background:#fff;color:#4b4fa0;outline:none;-webkit-user-select:text;user-select:text;-webkit-appearance:none}
+#sheetInput.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.chips{display:flex;gap:8px;margin:12px 0}
+#todo .chip{flex:1;padding:8px 0;border-radius:999px;border:3px solid #c7c4de;background:#fff;font-weight:800;color:#6a70c8;display:flex;align-items:center;justify-content:center;gap:4px}
+#todo .chip .ic{width:20px;height:20px}
+#todo .chip.on{background:linear-gradient(#fff2b8,#ffd54a);border-color:#f0a92b;color:#8a5a00}
+.sbtns{display:flex;gap:8px}
+#todo .sbtns button{flex:1;padding:12px 0;border-radius:999px;font-weight:800;font-size:16px;border:3px solid #c7c4de;background:#fff;color:#6a70c8}
+#todo #sheetOk{background:linear-gradient(#b3deff,#6f94ff);border-color:#5964e0;color:#fff;text-shadow:0 1px 2px rgba(60,70,190,.6)}
+#todo #sheetDel{background:linear-gradient(#ffd6e8,#ff9ccb);border-color:#e0609a;color:#fff;text-shadow:0 1px 2px rgba(190,60,120,.5)}
+#ttoast{position:absolute;left:50%;bottom:calc(104px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);padding:9px 18px;border-radius:999px;background:rgba(255,255,255,.95);color:#5560c8;font-weight:800;font-size:14px;white-space:nowrap;border:2px solid #b9c0f2;box-shadow:0 4px 10px rgba(110,120,210,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:9}
+#ttoast.show{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
 <body>
@@ -69,6 +157,47 @@ body{display:flex;justify-content:center;font-family:"M PLUS Rounded 1c","Hiragi
   <div id="title" class="screen">
     <img id="logo" src="logo.webp" alt="みんなのミネラル石けん部">
     <img id="tap" src="tap.webp" alt="TAP TO START">
+  </div>
+  <div id="todo" class="screen">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.4l2.9 6.1 6.7.9-4.9 4.7 1.2 6.6L12 17.4l-5.9 3.3 1.2-6.6L2.4 9.4l6.7-.9z" fill="#ffd54a" stroke="#f0a92b" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.2 8.4l1.6-3" stroke="#fff3b0" stroke-width="1.6" stroke-linecap="round"/></symbol><symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 3h10v5.2a5 5 0 0 1-10 0z" fill="#ffd54a" stroke="#e0a020" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 5H4.2v1.8A3.2 3.2 0 0 0 7.4 10M17 5h2.8v1.8a3.2 3.2 0 0 1-3.2 3.2" fill="none" stroke="#e0a020" stroke-width="1.6" stroke-linecap="round"/><rect x="10.4" y="13" width="3.2" height="4" fill="#f0b830"/><rect x="7.6" y="17" width="8.8" height="3.4" rx="1.2" fill="#ffd54a" stroke="#e0a020" stroke-width="1.4"/></symbol><symbol id="i-gift" viewBox="0 0 24 24"><rect x="3.2" y="10" width="17.6" height="11" rx="2" fill="#ff9ccb" stroke="#e0609a" stroke-width="1.6"/><rect x="2.4" y="6.6" width="19.2" height="4.2" rx="1.6" fill="#ffb8dc" stroke="#e0609a" stroke-width="1.6"/><rect x="10.4" y="6.6" width="3.2" height="14.4" fill="#ffd54a"/><path d="M12 6.4C10 2.2 6 3 6.6 5.6c.4 1.6 3.4 1.2 5.4.8zm0 0c2-4.2 6-3.4 5.4-.8-.4 1.6-3.4 1.2-5.4.8z" fill="#ffd54a" stroke="#e0a020" stroke-width="1.3" stroke-linejoin="round"/></symbol><symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16.4" rx="3.2" fill="#fff" stroke="#6f78e0" stroke-width="1.8"/><path d="M3 9.6V8.2A3.2 3.2 0 0 1 6.2 5h11.6A3.2 3.2 0 0 1 21 8.2v1.4z" fill="#8f9bf5"/><circle cx="8" cy="3.8" r="1.7" fill="#6f78e0"/><circle cx="16" cy="3.8" r="1.7" fill="#6f78e0"/><g fill="#c9a6f5"><rect x="6" y="12" width="3" height="3" rx=".8"/><rect x="10.5" y="12" width="3" height="3" rx=".8"/><rect x="15" y="12" width="3" height="3" rx=".8"/><rect x="6" y="16.5" width="3" height="3" rx=".8"/><rect x="10.5" y="16.5" width="3" height="3" rx=".8" fill="#ff9ccb"/></g></symbol><symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.2L12 3l9 8.2V20a1.2 1.2 0 0 1-1.2 1.2H15v-6H9v6H4.2A1.2 1.2 0 0 1 3 20z" fill="#d6defc" stroke="#5a63e0" stroke-width="1.8" stroke-linejoin="round"/><path d="M2.6 11.4L12 3l9.4 8.4" fill="none" stroke="#5a63e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-note" viewBox="0 0 24 24"><rect x="5" y="3.4" width="14" height="17.6" rx="3" fill="#eef1ff" stroke="#5a63e0" stroke-width="1.8"/><path d="M8.4 9.4l1.3 1.3 2.4-2.6M8.4 14.6l1.3 1.3 2.4-2.6M14.4 9.6h2M14.4 14.8h2" fill="none" stroke="#5a63e0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.4v2.6M12 2.4v2.6M15.5 2.4v2.6" stroke="#5a63e0" stroke-width="2" stroke-linecap="round"/></symbol><symbol id="i-pad" viewBox="0 0 24 24"><path d="M7 7.6h10a4.4 4.4 0 0 1 4.4 4.4v3a3.2 3.2 0 0 1-5.5 2.2l-1.4-1.5H9.5l-1.4 1.5A3.2 3.2 0 0 1 2.6 15v-3A4.4 4.4 0 0 1 7 7.6z" fill="#eef1ff" stroke="#5a63e0" stroke-width="1.8" stroke-linejoin="round"/><path d="M7.4 10.6v3.2M5.8 12.2h3.2" stroke="#5a63e0" stroke-width="1.7" stroke-linecap="round"/><circle cx="15.8" cy="11.2" r="1.1" fill="#ff9ccb"/><circle cx="18.2" cy="13.4" r="1.1" fill="#6fcfff"/></symbol><symbol id="i-gacha" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6.6" fill="#eaf1ff" stroke="#5a63e0" stroke-width="1.8"/><path d="M7.2 15.4L5.6 21h12.8l-1.6-5.6z" fill="#ffb8dc" stroke="#5a63e0" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="18" r="1.7" fill="#fff" stroke="#5a63e0" stroke-width="1.3"/><circle cx="9.8" cy="8.6" r="1.7" fill="#ffd54a"/><circle cx="14.2" cy="9.6" r="1.7" fill="#ff9ccb"/><circle cx="12.2" cy="6.4" r="1.3" fill="#6fcfff"/></symbol><symbol id="i-gear" viewBox="0 0 24 24"><path d="M10.4 2.6h3.2l.6 2.5 1.7 1 2.4-.8 1.6 2.8-1.9 1.8v2l1.9 1.8-1.6 2.8-2.4-.8-1.7 1-.6 2.5h-3.2l-.6-2.5-1.7-1-2.4.8-1.6-2.8 1.9-1.8v-2L4.1 7.1l1.6-2.8 2.4.8 1.7-1z" fill="#d8ddff" stroke="#5a63e0" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.2" fill="#fff" stroke="#5a63e0" stroke-width="1.7"/></symbol><symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="#8a90d8" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M6.2 6.2l11.6 11.6M17.8 6.2L6.2 17.8" fill="none" stroke="#5a63e0" stroke-width="3.4" stroke-linecap="round"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4.6v14.8M4.6 12h14.8" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.2" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></symbol></defs></svg>
+    <header id="tHead">
+      <img id="tTitle" src="btn-todo.webp" alt="Todo">
+      <div id="tRight">
+        <div class="pill" id="tkPill" hidden><svg class="ic"><use href="#i-gift"/></svg><b id="tkNum">0</b></div>
+        <div class="pill" id="starPill"><svg class="ic"><use href="#i-star"/></svg><b id="starNum">0</b></div>
+        <button class="xbtn" id="tClose" aria-label="閉じる"><svg class="ic"><use href="#i-x"/></svg></button>
+      </div>
+    </header>
+    <main id="tMain">
+      <section class="tcard">
+        <div class="chead"><svg class="ic big"><use href="#i-cal"/></svg><h2>今日のタスク</h2><span class="count" id="tCount">0 / 0</span></div>
+        <div id="tList"></div>
+        <button class="addbtn" id="tAdd"><svg class="ic"><use href="#i-plus"/></svg>タスクを追加</button>
+      </section>
+      <section class="tcard">
+        <div class="chead"><svg class="ic big"><use href="#i-trophy"/></svg><h2>達成報酬</h2></div>
+        <div id="track"><div id="trackLine"><div id="trackFill"></div></div><div id="nodes"></div></div>
+      </section>
+    </main>
+    <nav id="tNav">
+      <button class="ntab" data-tab="home"><svg class="ic"><use href="#i-home"/></svg>ホーム</button>
+      <button class="ntab act" data-tab="todo"><svg class="ic"><use href="#i-note"/></svg>Todo</button>
+      <button class="ntab" data-tab="game"><svg class="ic"><use href="#i-pad"/></svg>ミニゲーム</button>
+      <button class="ntab" data-tab="gacha"><svg class="ic"><use href="#i-gacha"/></svg>ガチャ</button>
+      <button class="ntab" data-tab="set"><svg class="ic"><use href="#i-gear"/></svg>設定</button>
+    </nav>
+    <div id="fx"></div>
+    <div id="sheetWrap"><div class="sheet">
+      <h3 id="sheetTitle">タスクを追加</h3>
+      <input id="sheetInput" maxlength="40" placeholder="やることを入力" autocomplete="off">
+      <div class="chips" id="chips">
+        <button class="chip" data-star="10"><svg class="ic"><use href="#i-star"/></svg>+10</button>
+        <button class="chip" data-star="20"><svg class="ic"><use href="#i-star"/></svg>+20</button>
+        <button class="chip" data-star="30"><svg class="ic"><use href="#i-star"/></svg>+30</button>
+      </div>
+      <div class="sbtns"><button id="sheetCancel">やめる</button><button id="sheetDel">削除</button><button id="sheetOk">追加</button></div>
+    </div></div>
+    <div id="ttoast"></div>
   </div>
 </div>
 
@@ -163,7 +292,136 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) tick
 /* ===== ホームのボタン(中身はこれから) ===== */
 let toastT;
 function say(t){ const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("show"), 1500); }
-document.querySelectorAll(".hbtn").forEach(b => b.addEventListener("click", () => say(b.dataset.name + "は、まだ準備中だよ")));
+document.querySelectorAll(".hbtn").forEach(b => b.addEventListener("click", () => b.dataset.name === "Todo" ? openTodo() : say(b.dataset.name + "は、まだ準備中だよ")));
+
+/* ===== Todo(タスク管理 + ミッション) ===== */
+const TKEY = "mineral-todo-v1";
+const MISSIONS = [   // 今日のタスクを n 個完了すると受け取れる報酬
+  {n:1, kind:"stars",  v:10, label:"1個"},
+  {n:2, kind:"stars",  v:20, label:"2個"},
+  {n:3, kind:"ticket", v:1,  label:"3個"}
+];
+const pad2 = n => String(n).padStart(2, "0");
+const todayStr = () => { const d = new Date(); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); };
+let T = (() => { try { const o = JSON.parse(localStorage.getItem(TKEY)); if (o && Array.isArray(o.tasks)) return o; } catch(e) {} return {tasks:[], stars:0, tickets:0, day:todayStr(), count:0, claimed:{}}; })();
+const saveT = () => { try { localStorage.setItem(TKEY, JSON.stringify(T)); } catch(e) {} };
+function rollDay(){   // 日付が変わったら、完了済みを片づけてミッションをリセット(未完了は持ち越し)
+  const t = todayStr();
+  if (T.day !== t) { T.tasks = T.tasks.filter(x => !x.done); T.day = t; T.count = 0; T.claimed = {}; saveT(); }
+}
+const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let newId = null, editId = null, pickStars = 10, delArmed = false, ttoastT;
+
+function tsay(t){ const el = $("ttoast"); el.textContent = t; el.classList.add("show"); clearTimeout(ttoastT); ttoastT = setTimeout(() => el.classList.remove("show"), 1700); }
+function chime(kind){   // 完了・報酬のポンッという音
+  if (!AUD.ctx || AUD.sfxVol <= 0) return;
+  const t = AUD.ctx.currentTime, notes = kind === "big" ? [659, 784, 988, 1319] : [784, 1175];
+  notes.forEach((f, i) => tone(t + i * 0.07, f, f * 1.01, 0.2, 0.18, "sine"));
+}
+function popPill(){ const el = $("starPill"); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
+function burst(el){   // キラキラとシャボン玉がはじける
+  const r = el.getBoundingClientRect(), p = $("todo").getBoundingClientRect(), cx = r.left - p.left + r.width / 2, cy = r.top - p.top + r.height / 2;
+  for (let i = 0; i < 10; i++) {
+    const a = Math.PI * 2 * i / 10 + Math.random() * 0.4, d = 38 + Math.random() * 38, e = document.createElement("i");
+    e.className = "spk" + (i % 3 === 0 ? " bub" : "");
+    e.style.cssText = "left:" + cx + "px;top:" + cy + "px;--dx:" + Math.cos(a) * d + "px;--dy:" + Math.sin(a) * d + "px";
+    if (i % 3) e.innerHTML = '<svg class="ic"><use href="#i-star"/></svg>';
+    $("fx").appendChild(e); setTimeout(() => e.remove(), 850);
+  }
+}
+function floatTxt(el, txt){
+  const r = el.getBoundingClientRect(), p = $("todo").getBoundingClientRect(), e = document.createElement("div");
+  e.className = "ftxt"; e.textContent = txt; e.style.left = (r.left - p.left + r.width / 2) + "px"; e.style.top = (r.top - p.top - 6) + "px";
+  $("fx").appendChild(e); setTimeout(() => e.remove(), 950);
+}
+
+function renderTodo(){
+  const done = T.tasks.filter(x => x.done).length;
+  $("tCount").textContent = done + " / " + T.tasks.length;
+  $("tList").innerHTML = T.tasks.length ? T.tasks.map(t =>
+    '<div class="trow' + (t.done ? " done" : "") + (t.id === newId ? " new" : "") + '" data-id="' + t.id + '">' +
+    '<button class="chk" data-act="toggle" aria-label="完了"><svg class="ic"><use href="#i-check"/></svg></button>' +
+    '<button class="ttxt" data-act="edit">' + esc(t.text) + '</button>' +
+    '<span class="rew"><svg class="ic"><use href="#i-star"/></svg>+' + t.stars + '</span>' +
+    '<button class="chev" data-act="edit" aria-label="編集"><svg class="ic"><use href="#i-chev"/></svg></button></div>').join("")
+    : '<div class="empty">まだタスクがないよ<br>「タスクを追加」から作ってみよう</div>';
+  newId = null;
+  $("starNum").textContent = T.stars; $("tkNum").textContent = T.tickets; $("tkPill").hidden = T.tickets <= 0;
+  $("trackFill").style.width = (Math.min(Math.max(T.count - 1, 0), 2) / 2 * 100) + "%";
+  $("nodes").innerHTML = MISSIONS.map(m => {
+    const got = !!T.claimed[m.n], ready = !got && T.count >= m.n;
+    const icon = m.kind === "stars" ? '<span class="nstar"><svg class="ic"><use href="#i-star"/></svg><em>×' + m.v + '</em></span>' : '<svg class="ic"><use href="#i-gift"/></svg>';
+    return '<div class="node' + (got ? " got" : ready ? " ready" : "") + '"><button class="nbub" data-claim="' + m.n + '" aria-label="報酬">' + icon +
+      (got ? '<span class="ok"><svg class="ic"><use href="#i-check"/></svg></span>' : "") + '</button><div class="nlab">' + (ready ? "うけとる！" : m.label) + '</div></div>';
+  }).join("");
+}
+function toggleTask(id){
+  const t = T.tasks.find(x => x.id === id); if (!t) return;
+  const before = T.count; t.done = !t.done;
+  if (t.done) { T.stars += t.stars; T.count++; } else { T.stars = Math.max(0, T.stars - t.stars); T.count = Math.max(0, T.count - 1); }
+  saveT(); renderTodo();
+  const chk = document.querySelector('.trow[data-id="' + id + '"] .chk');
+  if (t.done && chk) {
+    chk.classList.add("pop"); burst(chk); floatTxt(chk, "+" + t.stars + "★"); chime("small"); popPill();
+    if (MISSIONS.some(m => before < m.n && T.count >= m.n && !T.claimed[m.n])) setTimeout(() => { chime("big"); tsay("報酬が受け取れるよ！"); }, 380);
+  }
+}
+function claim(n){
+  const m = MISSIONS.find(x => x.n === n); if (!m) return;
+  if (T.claimed[n]) { tsay("もう受け取ったよ"); return; }
+  if (T.count < n) { tsay("タスクを" + n + "個完了すると受け取れるよ"); return; }
+  T.claimed[n] = true; if (m.kind === "stars") T.stars += m.v; else T.tickets += m.v;
+  saveT(); renderTodo();
+  const b = document.querySelector('[data-claim="' + n + '"]'); if (b) { burst(b); floatTxt(b, m.kind === "stars" ? "+" + m.v + "★" : "チケット+1"); }
+  chime("big"); popPill(); tsay(m.kind === "stars" ? "★" + m.v + " ゲット！" : "ガチャチケットを1枚ゲット！(ガチャは準備中)");
+}
+
+/* 追加・編集シート */
+function updateChips(){ document.querySelectorAll("#chips .chip").forEach(c => c.classList.toggle("on", Number(c.dataset.star) === pickStars)); }
+function openSheet(id){
+  editId = id || null; delArmed = false; const t = id && T.tasks.find(x => x.id === id);
+  $("sheetTitle").textContent = t ? "タスクを編集" : "タスクを追加";
+  $("sheetInput").value = t ? t.text : ""; pickStars = t ? t.stars : 10; updateChips();
+  $("sheetDel").style.display = t ? "" : "none"; $("sheetDel").textContent = "削除"; $("sheetOk").textContent = t ? "保存" : "追加";
+  $("chips").style.display = t && t.done ? "none" : "";   // 完了済みは★を変えられない
+  $("sheetWrap").classList.add("on");
+}
+function closeSheet(){ $("sheetWrap").classList.remove("on"); $("sheetInput").blur(); }
+$("tAdd").addEventListener("click", () => { if (T.tasks.length >= 50) { tsay("タスクは50個までだよ"); return; } openSheet(null); setTimeout(() => $("sheetInput").focus(), 380); });
+$("chips").addEventListener("click", e => { const c = e.target.closest("[data-star]"); if (c) { pickStars = Number(c.dataset.star); updateChips(); } });
+$("sheetCancel").addEventListener("click", closeSheet);
+$("sheetWrap").addEventListener("click", e => { if (e.target === $("sheetWrap")) closeSheet(); });
+$("sheetOk").addEventListener("click", () => {
+  const text = $("sheetInput").value.trim();
+  if (!text) { const i = $("sheetInput"); i.classList.remove("shake"); void i.offsetWidth; i.classList.add("shake"); tsay("タスクの名前を入れてね"); return; }
+  if (editId) { const t = T.tasks.find(x => x.id === editId); if (t) { t.text = text; if (!t.done) t.stars = pickStars; } }
+  else { const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 5); T.tasks.push({id, text, stars:pickStars, done:false}); newId = id; chime("small"); }
+  saveT(); closeSheet(); renderTodo();
+});
+$("sheetDel").addEventListener("click", () => {
+  if (!delArmed) { delArmed = true; $("sheetDel").textContent = "もう一度で削除"; setTimeout(() => { delArmed = false; $("sheetDel").textContent = "削除"; }, 3000); return; }
+  T.tasks = T.tasks.filter(x => x.id !== editId); saveT(); closeSheet(); renderTodo(); tsay("削除したよ");
+});
+$("tList").addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const id = b.closest(".trow").dataset.id;
+  if (b.dataset.act === "toggle") toggleTask(id); else openSheet(id);
+});
+$("nodes").addEventListener("click", e => { const b = e.target.closest("[data-claim]"); if (b) claim(Number(b.dataset.claim)); });
+
+/* 開く・閉じる・下のタブ */
+function openTodo(){
+  rollDay(); renderTodo(); $("tMain").scrollTop = 0;
+  const el = $("todo"); el.classList.add("open"); requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("on")));
+}
+function closeTodo(){ const el = $("todo"); el.classList.remove("on"); closeSheet(); setTimeout(() => el.classList.remove("open"), 300); }
+$("tClose").addEventListener("click", closeTodo);
+document.querySelectorAll("#tNav .ntab").forEach(b => b.addEventListener("click", () => {
+  const k = b.dataset.tab;
+  if (k === "home") closeTodo();
+  else if (k !== "todo") tsay(({game:"ミニゲーム", gacha:"ガチャ", set:"設定"})[k] + "は、まだ準備中だよ");
+}));
+setInterval(() => { if ($("todo").classList.contains("open")) { const d = T.day; rollDay(); if (d !== T.day) renderTodo(); } }, 60000);
 
 /* 先読み(切り替え時に画像が遅れて出ないように) */
 ["home-bg.jpg", "default.webp", "hud.webp", "btn-todo.webp", "btn-game.webp", "btn-gacha.webp", "btn-set.webp"].forEach(src => { const i = new Image(); i.src = src; });
