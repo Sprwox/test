@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>みんなのミネラル石けん部</title>
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap">
 <meta name="theme-color" content="#d6d0f4">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,7 +16,7 @@
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 html,body{height:100%;margin:0;overscroll-behavior:none;touch-action:manipulation;background:#cfc8ee}
-body{display:flex;justify-content:center;font-family:"Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN",sans-serif}
+body{display:flex;justify-content:center;font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN",sans-serif}
 #app{position:relative;width:100%;max-width:480px;height:100%;overflow:hidden;background:#d6d0f4}
 .screen{position:absolute;inset:0;background-repeat:no-repeat;background-size:cover}
 
@@ -32,11 +34,38 @@ body{display:flex;justify-content:center;font-family:"Hiragino Maru Gothic ProN"
 #chara img{display:block;height:100%;width:auto}
 #chara::before{content:"";position:absolute;left:50%;bottom:-1.2%;width:70%;height:3.2%;transform:translateX(-50%);border-radius:50%;background:rgba(70,50,60,.28);filter:blur(5px)}
 #home.show #chara{opacity:1}
+/* ===== ホーム画面のUI(やわらかいパステル・シャボン玉) ===== */
+.ui{opacity:0;pointer-events:none;transition:opacity .9s ease .35s}
+#home.show .ui{opacity:1}
+#hud{position:absolute;left:8px;top:calc(8px + env(safe-area-inset-top,0px));--w:min(72vw,300px);width:var(--w);filter:drop-shadow(0 3px 6px rgba(90,100,170,.18))}
+#hud img{display:block;width:100%;height:auto}
+#clock{position:absolute;left:24%;right:24%;top:58%;transform:translateY(-50%);display:flex;align-items:baseline;justify-content:center;gap:calc(var(--w) * .025);color:#5560c8;font-weight:800;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.95),0 0 6px rgba(255,255,255,.8)}
+#clockDate{font-size:calc(var(--w) * .046)}
+#clockTime{font-size:calc(var(--w) * .066);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.hbtn{padding:0;border:none;background:none;width:min(25vw,100px);cursor:pointer;-webkit-appearance:none;appearance:none;animation:floaty 4s ease-in-out infinite;transition:transform .12s ease}
+.hbtn img{display:block;width:100%;height:auto;pointer-events:none;filter:drop-shadow(0 4px 6px rgba(90,100,170,.25))}
+#home.show .hbtn{pointer-events:auto}
+.hbtn:active{transform:scale(.93)}
+@keyframes floaty{0%,100%{translate:0 0}50%{translate:0 -3px}}
+#btnTodo{position:absolute;left:6px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+#rcol{position:absolute;right:6px;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px}
+#toast{position:absolute;left:50%;top:calc(78px + env(safe-area-inset-top,0px));transform:translate(-50%,-6px);padding:9px 18px;border-radius:999px;background:rgba(255,255,255,.93);color:#5560c8;font-weight:800;font-size:14px;white-space:nowrap;border:2px solid #b9c0f2;box-shadow:0 4px 10px rgba(110,120,210,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:5}
+#toast.show{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
 <body>
 <div id="app">
-  <div id="home" class="screen"><div id="chara"><img id="charaImg" alt="default" src="default.webp"></div></div>
+  <div id="home" class="screen">
+    <div id="chara"><img id="charaImg" alt="default" src="default.webp"></div>
+    <div id="hud" class="ui"><img src="hud.webp" alt=""><div id="clock"><span id="clockDate">--/--</span><span id="clockTime">--:--</span></div></div>
+    <button class="hbtn ui" id="btnTodo" data-name="Todo" style="animation-delay:-1.2s"><img src="btn-todo.webp" alt="Todo"></button>
+    <div id="rcol" class="ui">
+      <button class="hbtn" data-name="ミニゲーム" style="animation-delay:-0.4s"><img src="btn-game.webp" alt="ミニゲーム"></button>
+      <button class="hbtn" data-name="ガチャ" style="animation-delay:-2.1s"><img src="btn-gacha.webp" alt="ガチャ"></button>
+      <button class="hbtn" data-name="設定" style="animation-delay:-3.0s"><img src="btn-set.webp" alt="設定"></button>
+    </div>
+    <div id="toast"></div>
+  </div>
   <div id="title" class="screen">
     <img id="logo" src="logo.webp" alt="みんなのミネラル石けん部">
     <img id="tap" src="tap.webp" alt="TAP TO START">
@@ -121,8 +150,23 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) { if (AUD.bgm) AUD.bgm.pause(); AUD.ctx.suspend(); } else { AUD.ctx.resume(); playBgm(); }
 });
 
+/* ===== ホームの日付と時間(現実の時刻) ===== */
+const WD = ["日","月","火","水","木","金","土"];
+function tickClock(){
+  const d = new Date(), p = n => String(n).padStart(2, "0");
+  $("clockDate").textContent = (d.getMonth() + 1) + "/" + d.getDate() + " (" + WD[d.getDay()] + ")";
+  $("clockTime").textContent = p(d.getHours()) + ":" + p(d.getMinutes());
+}
+tickClock(); setInterval(tickClock, 1000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) tickClock(); });
+
+/* ===== ホームのボタン(中身はこれから) ===== */
+let toastT;
+function say(t){ const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("show"), 1500); }
+document.querySelectorAll(".hbtn").forEach(b => b.addEventListener("click", () => say(b.dataset.name + "は、まだ準備中だよ")));
+
 /* 先読み(切り替え時に画像が遅れて出ないように) */
-["home-bg.jpg", "default.webp"].forEach(src => { const i = new Image(); i.src = src; });
+["home-bg.jpg", "default.webp", "hud.webp", "btn-todo.webp", "btn-game.webp", "btn-gacha.webp", "btn-set.webp"].forEach(src => { const i = new Image(); i.src = src; });
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
 </body>
