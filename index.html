@@ -167,7 +167,7 @@ body{display:flex;justify-content:center;font-family:"M PLUS Rounded 1c","Hiragi
 .mglogo{width:min(86%,380px);height:auto;filter:drop-shadow(0 6px 10px rgba(100,110,200,.25))}
 .mgtag{padding:5px 22px;border-radius:999px;background:linear-gradient(#fff3d6,#ffe0b0);border:3px solid #fff;color:#c9803a;font-weight:800;font-size:18px;box-shadow:0 4px 10px rgba(220,160,90,.3);margin-top:-6px}
 .mgrow{display:flex;align-items:center;gap:6px;width:100%;max-width:400px;justify-content:center}
-.mgchar{width:38%;max-width:150px;height:auto;animation:mgBob 2.4s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(100,110,200,.25))}
+.mgchar{width:38%;max-width:150px;aspect-ratio:1/1;object-fit:contain;animation:mgBob 2.4s ease-in-out infinite;filter:drop-shadow(0 6px 8px rgba(100,110,200,.25))}
 @keyframes mgBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-9px) rotate(3deg)}}
 .mgbub{position:relative;flex:1;padding:12px 14px;border-radius:26px;background:rgba(255,255,255,.95);border:3px solid #cfd2f5;font-weight:800;font-size:15px;line-height:1.5;text-align:center;box-shadow:0 5px 10px rgba(100,110,200,.18)}
 .mgbub::before{content:"";position:absolute;left:-12px;top:50%;margin-top:-8px;border:8px solid transparent;border-right:12px solid #cfd2f5;border-left:0}
@@ -192,6 +192,7 @@ body{display:flex;justify-content:center;font-family:"M PLUS Rounded 1c","Hiragi
 .hp.big b{font-size:40px}
 #mgNew{position:absolute;right:-6px;top:-10px;padding:2px 10px;border-radius:999px;background:linear-gradient(#ffe27a,#ffc13d);border:2px solid #fff;color:#b36a00;font-style:normal;font-weight:800;font-size:13px;transform:rotate(8deg);display:none}
 #mgNew.on{display:block;animation:pillPop .6s cubic-bezier(.2,1.8,.4,1)}
+.mgpface{width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(100,110,200,.25))}
 .mgpt{font-weight:800;font-size:40px;color:#7a72d8;-webkit-text-stroke:8px #fff;paint-order:stroke fill;text-shadow:0 5px 0 rgba(120,130,230,.4);margin-bottom:6px}
 #mgFlash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 </style>
@@ -232,7 +233,7 @@ body{display:flex;justify-content:center;font-family:"M PLUS Rounded 1c","Hiragi
       <button class="mgx" id="mgX" aria-label="閉じる"><svg class="ic"><use href="#i-x"/></svg></button>
       <img class="mglogo" src="logo.webp" alt="みんなのミネラル石けん部">
       <div class="mgtag">✧ ミニゲーム ✧</div>
-      <div class="mgrow"><img class="mgchar" src="mg-fly.webp" alt=""><div class="mgbub">シャボン玉をよけて<br>どこまでいけるかな？<span>♥</span></div></div>
+      <div class="mgrow"><img class="mgchar" id="mgChar" src="mg-face-1.webp" alt=""><div class="mgbub">シャボン玉をよけて<br>どこまでいけるかな？<span>♥</span></div></div>
       <button class="mgbtn purple" id="mgGo"><svg class="ic"><use href="#g-play"/></svg>スタート</button>
     </div>
     <div id="mgOver" class="mgp">
@@ -244,6 +245,7 @@ body{display:flex;justify-content:center;font-family:"M PLUS Rounded 1c","Hiragi
       <div class="mgbtns"><button class="mgbtn lav" id="mgTop"><svg class="ic"><use href="#i-home"/></svg>TOPへ</button><button class="mgbtn pink" id="mgRetry"><svg class="ic"><use href="#g-retry"/></svg>もう1回</button></div>
     </div>
     <div id="mgPauseP" class="mgp">
+      <img class="mgpface" id="mgPFace" src="mg-face-1.webp" alt="">
       <div class="mgpt">ひとやすみ</div>
       <div class="mgbtns"><button class="mgbtn lav" id="mgPTop"><svg class="ic"><use href="#i-home"/></svg>TOPへ</button><button class="mgbtn purple" id="mgResume"><svg class="ic"><use href="#g-play"/></svg>つづける</button></div>
     </div>
@@ -517,10 +519,15 @@ setInterval(() => { if ($("todo").classList.contains("open")) { const d = T.day;
 
 /* ===== ミニゲーム(シャボン玉をよけて、どこまでいけるかな？) ===== */
 const MGK = "mineral-flappy-best";
-const MGC = {G:1650, FLAP:-470, SPEED:150, GAP:180, PW:60, SPACE:208, GROUND:74, R:13};   // 重力・ジャンプ・速さ・すき間・瓶の幅・間隔・地面の高さ・当たりの半径
-const MG = {open:false, state:"idle", prev:"play", W:360, S:1, t:0, last:0, raf:0, bx:100, by:300, vy:0, rot:0, pipes:[], score:0, best:0, isNew:false, spd:.45, deadT:0, flash:0, ctx:null, overShown:false};
+const MGC = {G:1650, FLAP:-470, SPEED:150, GAP:180, PW:66, SPACE:208, GROUND:74, R:13};   // 重力・ジャンプ・速さ・すき間・瓶の幅・間隔・地面の高さ・当たりの半径
+const MG = {jumpT:0, open:false, state:"idle", prev:"play", W:360, S:1, t:0, last:0, raf:0, bx:100, by:300, vy:0, rot:0, pipes:[], score:0, best:0, isNew:false, spd:.45, deadT:0, flash:0, ctx:null, overShown:false};
 try { MG.best = Number(localStorage.getItem(MGK)) || 0; } catch(e) {}
 const mgFly = new Image(); mgFly.src = "mg-fly.webp";
+const mgJump = new Image(); mgJump.src = "mg-jump.webp";
+const mgBot = new Image(); mgBot.src = "mg-bottles.webp";
+const BOT = [{sx:0,sw:230,sh:443,row:394},{sx:240,sw:230,sh:460,row:379},{sx:480,sw:230,sh:464,row:413},{sx:720,sw:230,sh:462,row:403},{sx:960,sw:230,sh:450,row:378}];   // 瓶5色(まん中のなめらかな1行を、縦にのばす)
+const GEO = [[.17,.83,0,.13],[.34,.66,.13,.34],[.12,.88,.34,.42],[.04,.96,.42,9]];   // 当たり判定: ポンプの先 / くび / かた / 本体(瓶の幅・高さに対する割合)
+const FACES = 6, pickFace = () => "mg-face-" + (1 + Math.floor(Math.random() * FACES)) + ".webp";
 const rnd = (a, b) => a + Math.random() * (b - a), clampN = (v, a, b) => Math.max(a, Math.min(b, v));
 function genCity(hmin, hmax, col, win){ const a = []; let x = 0; while (x < 760) { const w = rnd(34, 70); a.push({x, w, h:rnd(hmin, hmax), wins:Math.floor(rnd(2, 5))}); x += w + rnd(2, 10); } return {a, col, win, w:x, off:0}; }
 const MGBG = {
@@ -593,13 +600,26 @@ function capBottle(g, x, yEnd, pw){   // 上からぶら下がる、キャップ
   rr(g, x - 2, yEnd - capH, pw + 4, capH, 6); g.fillStyle = "#8fb8f0"; g.fill(); g.stroke();
 }
 function hitRect(cx, cy, r, x, y, w, h){ const nx = clampN(cx, x, x + w), ny = clampN(cy, y, y + h), dx = cx - nx, dy = cy - ny; return dx * dx + dy * dy < r * r; }
+function bottleDraw(g, vi, x, yTip, targetLen, flip){   // yTip = ポンプの先。flip=true で逆さ(上からぶら下がる)
+  const v = BOT[vi], W = MGC.PW, sc = W / v.sw, nat = v.sh * sc, rowU = v.row * sc, botH = (v.sh - v.row) * sc, extra = Math.max(0, targetLen - nat);
+  g.save(); if (flip) { g.translate(x + W, yTip); g.rotate(Math.PI); } else g.translate(x, yTip);
+  g.drawImage(mgBot, v.sx, 0, v.sw, v.row, 0, 0, W, rowU);
+  if (extra > 0) g.drawImage(mgBot, v.sx, v.row, v.sw, 1, 0, rowU - 0.4, W, extra + 0.8);
+  g.drawImage(mgBot, v.sx, v.row, v.sw, v.sh - v.row, 0, rowU + extra, W, botH);
+  g.restore();
+}
+function bottleHit(x, yTip, vi, flip){
+  const v = BOT[vi], W = MGC.PW, H = v.sh * W / v.sw, pad = 3;
+  for (const [x0, x1, y0, y1] of GEO) {
+    const a = y0 * H, b = y1 >= 9 ? 900 : y1 * H, rx = x + x0 * W + pad / 2, rw = (x1 - x0) * W - pad, ry = flip ? yTip - b : yTip + a;
+    if (hitRect(MG.bx, MG.by, MGC.R, rx, ry, rw, b - a)) return true;
+  }
+  return false;
+}
 function mgHit(){
-  const pad = 3, W = MGC.PW;
   for (const p of MG.pipes) {
-    const top = p.gapY - MGC.GAP / 2, bot = p.gapY + MGC.GAP / 2, cx = p.x + W / 2;
-    if (hitRect(MG.bx, MG.by, MGC.R, p.x + pad, -80, W - pad * 2, top + 80 - pad)) return true;
-    if (hitRect(MG.bx, MG.by, MGC.R, cx - 15, bot + pad, 30, 30)) return true;
-    if (hitRect(MG.bx, MG.by, MGC.R, p.x + pad, bot + 32, W - pad * 2, 700)) return true;
+    const top = p.gapY - MGC.GAP / 2, bot = p.gapY + MGC.GAP / 2;
+    if (bottleHit(p.x, bot, p.vb, false) || bottleHit(p.x, top, p.vt, true)) return true;
   }
   return false;
 }
@@ -610,13 +630,13 @@ function sfxScore(){ if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.
 function sfxHit(){ if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.currentTime; noiseHit(t, 0.14, "lowpass", 900, 0.5); tone(t, 260, 70, 0.28, 0.3, "triangle"); }
 
 /* 進行 */
-function mgSetState(st){ MG.state = st; const el = $("mg"); el.classList.remove("st-start", "st-over", "st-pause", "ready", "hud"); if (st === "idle") el.classList.add("st-start"); if (st === "over") el.classList.add("st-over"); if (st === "paused") el.classList.add("st-pause", "hud"); if (st === "ready") el.classList.add("ready", "hud"); if (st === "play" || st === "dead") el.classList.add("hud"); }
+function mgSetState(st){ if (st === "idle") $("mgChar").src = pickFace(); if (st === "paused") $("mgPFace").src = pickFace(); MG.state = st; const el = $("mg"); el.classList.remove("st-start", "st-over", "st-pause", "ready", "hud"); if (st === "idle") el.classList.add("st-start"); if (st === "over") el.classList.add("st-over"); if (st === "paused") el.classList.add("st-pause", "hud"); if (st === "ready") el.classList.add("ready", "hud"); if (st === "play" || st === "dead") el.classList.add("hud"); }
 function mgReset(){ MG.bx = Math.min(110, MG.W * .3); MG.by = 300; MG.vy = 0; MG.rot = 0; MG.pipes = []; MG.score = 0; MG.isNew = false; MG.deadT = 0; MG.grace = 0; MG.overShown = false; $("mgScoreNum").textContent = 0; $("mgBestNum").textContent = MG.best; }
-function mgSpawn(x){ const lo = 130, hi = 640 - MGC.GROUND - 130; MG.pipes.push({x, gapY:rnd(lo, hi), passed:false}); }
+function mgSpawn(x){ const lo = 130, hi = 640 - MGC.GROUND - 130; MG.pipes.push({x, gapY:rnd(lo, hi), passed:false, vt:Math.floor(rnd(0, 5)), vb:Math.floor(rnd(0, 5))}); }
 function mgFlap(){
   if (!MG.open) return;
-  if (MG.state === "ready") { mgSetState("play"); MG.vy = MGC.FLAP; mgSpawn(MG.W + 30); sfxFlap(); return; }
-  if (MG.state === "play") { MG.vy = MGC.FLAP; sfxFlap(); }
+  if (MG.state === "ready") { mgSetState("play"); MG.vy = MGC.FLAP; MG.jumpT = .2; mgSpawn(MG.W + 30); sfxFlap(); return; }
+  if (MG.state === "play") { MG.vy = MGC.FLAP; MG.jumpT = .2; sfxFlap(); }
 }
 function mgDie(){
   MG.state = "dead"; MG.deadT = 0; MG.flash = 1; sfxHit();
@@ -651,10 +671,14 @@ function mgStep(dt){
 function mgDraw(dt){
   const g = MG.ctx; if (!g) return; g.setTransform(MG.S, 0, 0, MG.S, 0, 0);
   mgBg(g, dt);
-  for (const p of MG.pipes) { capBottle(g, p.x, p.gapY - MGC.GAP / 2, MGC.PW); pumpBottle(g, p.x, p.gapY + MGC.GAP / 2, MGC.PW); }
+  for (const p of MG.pipes) {
+    if (mgBot.complete && mgBot.naturalWidth) { bottleDraw(g, p.vt, p.x, p.gapY - MGC.GAP / 2, p.gapY - MGC.GAP / 2 + 90, true); bottleDraw(g, p.vb, p.x, p.gapY + MGC.GAP / 2, 720 - (p.gapY + MGC.GAP / 2), false); }
+    else { capBottle(g, p.x, p.gapY - MGC.GAP / 2, MGC.PW); pumpBottle(g, p.x, p.gapY + MGC.GAP / 2, MGC.PW); }
+  }
   mgGround(g, dt);
   if (MG.state !== "idle" && MG.state !== "over" && mgFly.complete && mgFly.naturalWidth) {
-    const w = 72, h = w * mgFly.naturalHeight / mgFly.naturalWidth; g.save(); g.translate(MG.bx, MG.by); g.rotate(MG.rot); g.drawImage(mgFly, -w / 2, -h / 2 - 2, w, h); g.restore();
+    const k = 74 / mgFly.naturalWidth, im = (MG.jumpT > 0 && mgJump.complete && mgJump.naturalWidth) ? mgJump : mgFly, w = im.naturalWidth * k, h = im.naturalHeight * k;
+    MG.jumpT = Math.max(0, MG.jumpT - dt); g.save(); g.translate(MG.bx, MG.by); g.rotate(im === mgJump ? MG.rot * .5 : MG.rot); g.drawImage(im, -w / 2, -h / 2 - 2, w, h); g.restore();
   }
   if (MG.flash > 0) { MG.flash = Math.max(0, MG.flash - dt * 3); $("mgFlash").style.opacity = MG.flash * .7; }
 }
@@ -680,7 +704,7 @@ $("mgPTop").addEventListener("click", closeMg);
 document.addEventListener("visibilitychange", () => { if (document.hidden && MG.open && MG.state === "play") { MG.prev = "play"; mgSetState("paused"); } });
 
 /* 先読み(切り替え時に画像が遅れて出ないように) */
-["home-bg.jpg", "default.webp", "mg-fly.webp", "mg-fall.webp", "hud.webp", "btn-todo.webp", "btn-game.webp", "btn-gacha.webp", "btn-set.webp"].forEach(src => { const i = new Image(); i.src = src; });
+["home-bg.jpg", "default.webp", "mg-fly.webp", "mg-jump.webp", "mg-fall.webp", "mg-bottles.webp", "mg-face-1.webp", "mg-face-2.webp", "mg-face-3.webp", "mg-face-4.webp", "mg-face-5.webp", "mg-face-6.webp", "hud.webp", "btn-todo.webp", "btn-game.webp", "btn-gacha.webp", "btn-set.webp"].forEach(src => { const i = new Image(); i.src = src; });
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
 </body>
