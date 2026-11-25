@@ -195,6 +195,32 @@ body{display:flex;justify-content:center;font-family:"M PLUS Rounded 1c","Hiragi
 .mgpface{width:130px;height:130px;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(100,110,200,.25))}
 .mgpt{font-weight:800;font-size:40px;color:#7a72d8;-webkit-text-stroke:8px #fff;paint-order:stroke fill;text-shadow:0 5px 0 rgba(120,130,230,.4);margin-bottom:6px}
 #mgFlash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+
+/* ===== Todo: 渡されたシャボン玉の絵に合わせた報酬・タブ ===== */
+#todo .rwhead{display:block;height:46px;width:auto;margin:-4px 0 6px -2px}
+#todo .nbub{width:min(23vw,92px);height:auto;border:0;background:none;box-shadow:none;border-radius:0;padding:0;transition:transform .12s ease,filter .2s}
+#todo .nbub img{display:block;width:100%;height:auto;pointer-events:none}
+#todo .node:not(.ready):not(.got) .nbub{opacity:.82;filter:saturate(.7) brightness(1.02)}
+#todo .node.ready .nbub{opacity:1;filter:drop-shadow(0 0 7px rgba(255,205,70,.95)) drop-shadow(0 0 2px rgba(255,170,30,.9));border:0;box-shadow:none;animation:nodeReady 1s ease-in-out infinite}
+#todo .node.got .nbub{opacity:.92;filter:saturate(.8);background:none;border:0}
+#todo .ok{right:2px;top:-4px}
+#trackLine{top:42px}
+#tNav{height:76px;padding:0 6px 6px;gap:0;align-items:flex-end;border:3px solid #bdb6f2;background:linear-gradient(rgba(255,255,255,.93),rgba(233,229,252,.96));box-shadow:0 8px 22px rgba(120,110,210,.3),inset 0 2px 0 #fff}
+#todo #tNav .ntab{flex:1;display:flex;align-items:flex-end;justify-content:center;padding:0;border:0;background:none;box-shadow:none;border-radius:0;transform:none;transition:transform .15s cubic-bezier(.2,1.5,.4,1);position:relative}
+#todo #tNav .ntab img{display:block;width:min(16.4vw,66px);height:auto;pointer-events:none;filter:drop-shadow(0 3px 5px rgba(110,100,200,.25))}
+#todo #tNav .ntab.act{flex:1;transform:translateY(-14px) scale(1.1);padding:0;background:none;border:0;box-shadow:none}
+#todo #tNav .ntab:active{transform:scale(.92)}
+#todo #tNav .ntab.act:active{transform:translateY(-12px) scale(1.04)}
+/* ===== ホーム画面に追加の案内(ブラウザで開いているとき) ===== */
+#guide{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(90,78,152,.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#guide.on{display:flex;animation:guideIn .45s cubic-bezier(.2,1.3,.4,1)}
+#guide.off{animation:guideOut .25s ease forwards}
+@keyframes guideIn{0%{opacity:0;transform:scale(.9)}100%{opacity:1;transform:none}}
+@keyframes guideOut{0%{opacity:1}100%{opacity:0;transform:scale(.96)}}
+#guideCard{position:relative;width:min(94%,460px)}
+#guideCard img{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 18px rgba(70,60,140,.35));pointer-events:none}
+#guideOk{position:absolute;left:29.8%;top:77.4%;width:41.9%;height:17.6%;border:0;background:none;border-radius:999px;cursor:pointer;transition:transform .1s ease}
+#guideOk:active{transform:scale(.94)}
 </style>
 </head>
 <body>
@@ -251,6 +277,7 @@ body{display:flex;justify-content:center;font-family:"M PLUS Rounded 1c","Hiragi
     </div>
     <div id="mgFlash"></div>
   </div>
+  <div id="guide"><div id="guideCard"><img src="install-guide.webp" alt="ブラウザで開いている場合は、共有のホーム画面に追加をしてから遊んでね"><button id="guideOk" aria-label="OK"></button></div></div>
   <div id="todo" class="screen">
     <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.4l2.9 6.1 6.7.9-4.9 4.7 1.2 6.6L12 17.4l-5.9 3.3 1.2-6.6L2.4 9.4l6.7-.9z" fill="#ffd54a" stroke="#f0a92b" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.2 8.4l1.6-3" stroke="#fff3b0" stroke-width="1.6" stroke-linecap="round"/></symbol><symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 3h10v5.2a5 5 0 0 1-10 0z" fill="#ffd54a" stroke="#e0a020" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 5H4.2v1.8A3.2 3.2 0 0 0 7.4 10M17 5h2.8v1.8a3.2 3.2 0 0 1-3.2 3.2" fill="none" stroke="#e0a020" stroke-width="1.6" stroke-linecap="round"/><rect x="10.4" y="13" width="3.2" height="4" fill="#f0b830"/><rect x="7.6" y="17" width="8.8" height="3.4" rx="1.2" fill="#ffd54a" stroke="#e0a020" stroke-width="1.4"/></symbol><symbol id="i-gift" viewBox="0 0 24 24"><rect x="3.2" y="10" width="17.6" height="11" rx="2" fill="#ff9ccb" stroke="#e0609a" stroke-width="1.6"/><rect x="2.4" y="6.6" width="19.2" height="4.2" rx="1.6" fill="#ffb8dc" stroke="#e0609a" stroke-width="1.6"/><rect x="10.4" y="6.6" width="3.2" height="14.4" fill="#ffd54a"/><path d="M12 6.4C10 2.2 6 3 6.6 5.6c.4 1.6 3.4 1.2 5.4.8zm0 0c2-4.2 6-3.4 5.4-.8-.4 1.6-3.4 1.2-5.4.8z" fill="#ffd54a" stroke="#e0a020" stroke-width="1.3" stroke-linejoin="round"/></symbol><symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16.4" rx="3.2" fill="#fff" stroke="#6f78e0" stroke-width="1.8"/><path d="M3 9.6V8.2A3.2 3.2 0 0 1 6.2 5h11.6A3.2 3.2 0 0 1 21 8.2v1.4z" fill="#8f9bf5"/><circle cx="8" cy="3.8" r="1.7" fill="#6f78e0"/><circle cx="16" cy="3.8" r="1.7" fill="#6f78e0"/><g fill="#c9a6f5"><rect x="6" y="12" width="3" height="3" rx=".8"/><rect x="10.5" y="12" width="3" height="3" rx=".8"/><rect x="15" y="12" width="3" height="3" rx=".8"/><rect x="6" y="16.5" width="3" height="3" rx=".8"/><rect x="10.5" y="16.5" width="3" height="3" rx=".8" fill="#ff9ccb"/></g></symbol><symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.2L12 3l9 8.2V20a1.2 1.2 0 0 1-1.2 1.2H15v-6H9v6H4.2A1.2 1.2 0 0 1 3 20z" fill="#d6defc" stroke="#5a63e0" stroke-width="1.8" stroke-linejoin="round"/><path d="M2.6 11.4L12 3l9.4 8.4" fill="none" stroke="#5a63e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-note" viewBox="0 0 24 24"><rect x="5" y="3.4" width="14" height="17.6" rx="3" fill="#eef1ff" stroke="#5a63e0" stroke-width="1.8"/><path d="M8.4 9.4l1.3 1.3 2.4-2.6M8.4 14.6l1.3 1.3 2.4-2.6M14.4 9.6h2M14.4 14.8h2" fill="none" stroke="#5a63e0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2.4v2.6M12 2.4v2.6M15.5 2.4v2.6" stroke="#5a63e0" stroke-width="2" stroke-linecap="round"/></symbol><symbol id="i-pad" viewBox="0 0 24 24"><path d="M7 7.6h10a4.4 4.4 0 0 1 4.4 4.4v3a3.2 3.2 0 0 1-5.5 2.2l-1.4-1.5H9.5l-1.4 1.5A3.2 3.2 0 0 1 2.6 15v-3A4.4 4.4 0 0 1 7 7.6z" fill="#eef1ff" stroke="#5a63e0" stroke-width="1.8" stroke-linejoin="round"/><path d="M7.4 10.6v3.2M5.8 12.2h3.2" stroke="#5a63e0" stroke-width="1.7" stroke-linecap="round"/><circle cx="15.8" cy="11.2" r="1.1" fill="#ff9ccb"/><circle cx="18.2" cy="13.4" r="1.1" fill="#6fcfff"/></symbol><symbol id="i-gacha" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6.6" fill="#eaf1ff" stroke="#5a63e0" stroke-width="1.8"/><path d="M7.2 15.4L5.6 21h12.8l-1.6-5.6z" fill="#ffb8dc" stroke="#5a63e0" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="18" r="1.7" fill="#fff" stroke="#5a63e0" stroke-width="1.3"/><circle cx="9.8" cy="8.6" r="1.7" fill="#ffd54a"/><circle cx="14.2" cy="9.6" r="1.7" fill="#ff9ccb"/><circle cx="12.2" cy="6.4" r="1.3" fill="#6fcfff"/></symbol><symbol id="i-gear" viewBox="0 0 24 24"><path d="M10.4 2.6h3.2l.6 2.5 1.7 1 2.4-.8 1.6 2.8-1.9 1.8v2l1.9 1.8-1.6 2.8-2.4-.8-1.7 1-.6 2.5h-3.2l-.6-2.5-1.7-1-2.4.8-1.6-2.8 1.9-1.8v-2L4.1 7.1l1.6-2.8 2.4.8 1.7-1z" fill="#d8ddff" stroke="#5a63e0" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.2" fill="#fff" stroke="#5a63e0" stroke-width="1.7"/></symbol><symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="#8a90d8" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M6.2 6.2l11.6 11.6M17.8 6.2L6.2 17.8" fill="none" stroke="#5a63e0" stroke-width="3.4" stroke-linecap="round"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4.6v14.8M4.6 12h14.8" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.6l4.6 4.6L19 7.2" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></symbol></defs></svg>
     <header id="tHead">
@@ -268,16 +295,16 @@ body{display:flex;justify-content:center;font-family:"M PLUS Rounded 1c","Hiragi
         <button class="addbtn" id="tAdd"><svg class="ic"><use href="#i-plus"/></svg>タスクを追加</button>
       </section>
       <section class="tcard">
-        <div class="chead"><svg class="ic big"><use href="#i-trophy"/></svg><h2>達成報酬</h2></div>
+        <img class="rwhead" src="ui-rw-head.webp" alt="達成報酬">
         <div id="track"><div id="trackLine"><div id="trackFill"></div></div><div id="nodes"></div></div>
       </section>
     </main>
     <nav id="tNav">
-      <button class="ntab" data-tab="home"><svg class="ic"><use href="#i-home"/></svg>ホーム</button>
-      <button class="ntab act" data-tab="todo"><svg class="ic"><use href="#i-note"/></svg>Todo</button>
-      <button class="ntab" data-tab="game"><svg class="ic"><use href="#i-pad"/></svg>ミニゲーム</button>
-      <button class="ntab" data-tab="gacha"><svg class="ic"><use href="#i-gacha"/></svg>ガチャ</button>
-      <button class="ntab" data-tab="set"><svg class="ic"><use href="#i-gear"/></svg>設定</button>
+      <button class="ntab" data-tab="home" aria-label="ホーム"><img src="ui-nav-home.webp" alt="ホーム"></button>
+      <button class="ntab act" data-tab="todo" aria-label="Todo"><img src="ui-nav-todo.webp" alt="Todo"></button>
+      <button class="ntab" data-tab="game" aria-label="ミニゲーム"><img src="ui-nav-game.webp" alt="ミニゲーム"></button>
+      <button class="ntab" data-tab="gacha" aria-label="ガチャ"><img src="ui-nav-gacha.webp" alt="ガチャ"></button>
+      <button class="ntab" data-tab="set" aria-label="設定"><img src="ui-nav-set.webp" alt="設定"></button>
     </nav>
     <div id="fx"></div>
     <div id="sheetWrap"><div class="sheet">
@@ -303,6 +330,11 @@ function showChara(id){ const c = CHARAS[id] || CHARAS.default; $("charaImg").sr
 let homeChara = "default";
 try { homeChara = localStorage.getItem("home-chara") || "default"; } catch(e) {}
 showChara(homeChara);
+
+/* ===== ホーム画面に追加の案内: ブラウザで開いているときだけ、毎回出す ===== */
+const isStandalone = () => window.navigator.standalone === true || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+if (!isStandalone()) $("guide").classList.add("on");
+$("guideOk").addEventListener("click", () => { const g = $("guide"); g.classList.add("off"); setTimeout(() => { g.classList.remove("on", "off"); }, 260); });
 
 /* ===== 起動(画面のどこを押しても始まる) ===== */
 let started = false;
@@ -443,7 +475,7 @@ function renderTodo(){
   $("trackFill").style.width = (Math.min(Math.max(T.count - 1, 0), 2) / 2 * 100) + "%";
   $("nodes").innerHTML = MISSIONS.map(m => {
     const got = !!T.claimed[m.n], ready = !got && T.count >= m.n;
-    const icon = m.kind === "stars" ? '<span class="nstar"><svg class="ic"><use href="#i-star"/></svg><em>×' + m.v + '</em></span>' : '<svg class="ic"><use href="#i-gift"/></svg>';
+    const icon = '<img src="ui-rw-' + m.n + '.webp" alt="">';
     return '<div class="node' + (got ? " got" : ready ? " ready" : "") + '"><button class="nbub" data-claim="' + m.n + '" aria-label="報酬">' + icon +
       (got ? '<span class="ok"><svg class="ic"><use href="#i-check"/></svg></span>' : "") + '</button><div class="nlab">' + (ready ? "うけとる！" : m.label) + '</div></div>';
   }).join("");
@@ -704,7 +736,7 @@ $("mgPTop").addEventListener("click", closeMg);
 document.addEventListener("visibilitychange", () => { if (document.hidden && MG.open && MG.state === "play") { MG.prev = "play"; mgSetState("paused"); } });
 
 /* 先読み(切り替え時に画像が遅れて出ないように) */
-["home-bg.jpg", "default.webp", "mg-fly.webp", "mg-jump.webp", "mg-fall.webp", "mg-bottles.webp", "mg-face-1.webp", "mg-face-2.webp", "mg-face-3.webp", "mg-face-4.webp", "mg-face-5.webp", "mg-face-6.webp", "hud.webp", "btn-todo.webp", "btn-game.webp", "btn-gacha.webp", "btn-set.webp"].forEach(src => { const i = new Image(); i.src = src; });
+["home-bg.jpg", "install-guide.webp", "ui-rw-head.webp", "ui-rw-1.webp", "ui-rw-2.webp", "ui-rw-3.webp", "ui-nav-home.webp", "ui-nav-todo.webp", "ui-nav-game.webp", "ui-nav-gacha.webp", "ui-nav-set.webp", "default.webp", "mg-fly.webp", "mg-jump.webp", "mg-fall.webp", "mg-bottles.webp", "mg-face-1.webp", "mg-face-2.webp", "mg-face-3.webp", "mg-face-4.webp", "mg-face-5.webp", "mg-face-6.webp", "hud.webp", "btn-todo.webp", "btn-game.webp", "btn-gacha.webp", "btn-set.webp"].forEach(src => { const i = new Image(); i.src = src; });
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
 </body>
