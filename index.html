@@ -346,8 +346,22 @@ function startApp(){
 $("title").addEventListener("click", startApp);
 
 /* ===== 音(BGM・クリック音) ===== */
-const AUD = {ctx:null, started:false, bgm:null, bgmGain:null, sfxGain:null, bgmVol:0.7, sfxVol:0.8};
-function playBgm(){ if (!AUD.bgm || AUD.bgmVol <= 0) return; const r = AUD.bgm.play(); if (r && r.catch) r.catch(() => {}); }
+const AUD = {ctx:null, started:false, bgm:null, mgbgm:null, scene:"home", buf:{}, bgmGain:null, sfxGain:null, bgmVol:0.7, sfxVol:0.8};
+const curBgm = () => AUD.scene === "mg" ? AUD.mgbgm : AUD.bgm;
+function playBgm(){ const el = curBgm(); if (!el || AUD.bgmVol <= 0) return; const r = el.play(); if (r && r.catch) r.catch(() => {}); }
+function setScene(sc){   // "home" か "mg"(ミニゲーム)。BGMを切り替える
+  AUD.scene = sc; const home = AUD.bgm, mg = AUD.mgbgm;
+  if (sc === "mg") { if (home) home.pause(); if (mg) { mg.currentTime = 0; } } else { if (mg) mg.pause(); }
+  if (AUD.ctx && AUD.ctx.state === "suspended") AUD.ctx.resume();
+  playBgm();
+}
+function loadSfx(name, url){   // 効果音のファイルを、すぐ鳴らせる形に読み込む
+  fetch(url).then(r => r.arrayBuffer()).then(b => new Promise((ok, ng) => AUD.ctx.decodeAudioData(b, ok, ng))).then(buf => { AUD.buf[name] = buf; }).catch(() => {});
+}
+function playSfx(name, gain){   // 読み込めていれば true
+  const b = AUD.buf[name]; if (!AUD.ctx || !b) return false; if (AUD.sfxVol <= 0) return true;
+  const s = AUD.ctx.createBufferSource(), g = AUD.ctx.createGain(); s.buffer = b; g.gain.value = gain || 1; s.connect(g); g.connect(AUD.sfxGain); s.start(); return true;
+}
 function unlockAudio(){   // iPhoneは最初のタップまで音を出せない。タップのたびに呼ぶ
   if (!AUD.started) {
     AUD.started = true;
@@ -359,9 +373,12 @@ function unlockAudio(){   // iPhoneは最初のタップまで音を出せない
     AUD.bgmGain.connect(ctx.destination); AUD.sfxGain.connect(ctx.destination);
     const el = AUD.bgm = new Audio("bgm.mp3"); el.loop = true; el.preload = "auto";
     try { ctx.createMediaElementSource(el).connect(AUD.bgmGain); } catch(e) {}
+    const el2 = AUD.mgbgm = new Audio("mg-bgm.mp3"); el2.loop = true; el2.preload = "auto";   // ミニゲーム用のBGM
+    try { ctx.createMediaElementSource(el2).connect(AUD.bgmGain); } catch(e) {}
+    loadSfx("jump", "sfx-jump.mp3"); loadSfx("hit", "sfx-hit.mp3");
   }
   if (AUD.ctx && AUD.ctx.state === "suspended") AUD.ctx.resume();
-  if (AUD.bgm && AUD.bgm.paused && !document.hidden) playBgm();
+  const cur = curBgm(); if (cur && cur.paused && !document.hidden) playBgm();
 }
 let noiseB = null;
 function noiseHit(t, dur, type, freq, gain, q){
@@ -401,7 +418,7 @@ document.addEventListener("touchend", unlockAudio, true);
 document.addEventListener("click", unlockAudio, true);
 document.addEventListener("visibilitychange", () => {
   if (!AUD.ctx) return;
-  if (document.hidden) { if (AUD.bgm) AUD.bgm.pause(); AUD.ctx.suspend(); } else { AUD.ctx.resume(); playBgm(); }
+  if (document.hidden) { if (AUD.bgm) AUD.bgm.pause(); if (AUD.mgbgm) AUD.mgbgm.pause(); AUD.ctx.suspend(); } else { AUD.ctx.resume(); playBgm(); }
 });
 
 /* ===== ホームの日付と時間(現実の時刻) ===== */
@@ -657,9 +674,9 @@ function mgHit(){
 }
 
 /* 音(ふわっとしたやさしい音) */
-function sfxFlap(){ if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.currentTime; tone(t, 420, 780, 0.1, 0.13, "sine"); noiseHit(t, 0.03, "highpass", 3200, 0.05); }
+function sfxFlap(){ if (playSfx("jump", .55)) return; if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.currentTime; tone(t, 420, 780, 0.1, 0.13, "sine"); noiseHit(t, 0.03, "highpass", 3200, 0.05); }
 function sfxScore(){ if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.currentTime; tone(t, 880, 1180, 0.1, 0.14, "sine"); tone(t + 0.07, 1320, 1330, 0.16, 0.12, "sine"); }
-function sfxHit(){ if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.currentTime; noiseHit(t, 0.14, "lowpass", 900, 0.5); tone(t, 260, 70, 0.28, 0.3, "triangle"); }
+function sfxHit(){ if (playSfx("hit", .8)) return; if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.currentTime; noiseHit(t, 0.14, "lowpass", 900, 0.5); tone(t, 260, 70, 0.28, 0.3, "triangle"); }
 
 /* 進行 */
 function mgSetState(st){ if (st === "idle") $("mgChar").src = pickFace(); if (st === "paused") $("mgPFace").src = pickFace(); MG.state = st; const el = $("mg"); el.classList.remove("st-start", "st-over", "st-pause", "ready", "hud"); if (st === "idle") el.classList.add("st-start"); if (st === "over") el.classList.add("st-over"); if (st === "paused") el.classList.add("st-pause", "hud"); if (st === "ready") el.classList.add("ready", "hud"); if (st === "play" || st === "dead") el.classList.add("hud"); }
@@ -720,11 +737,12 @@ function mgLoop(ts){
   mgStep(dt); mgDraw(dt); MG.raf = requestAnimationFrame(mgLoop);
 }
 function openMg(){
+  setScene("mg");   // スタート画面からミニゲームのBGM
   MG.open = true; const el = $("mg"); el.classList.add("open"); mgResize(); mgReset(); mgSetState("idle");
   MG.last = performance.now(); cancelAnimationFrame(MG.raf); MG.raf = requestAnimationFrame(mgLoop);
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("on")));
 }
-function closeMg(){ const el = $("mg"); el.classList.remove("on"); MG.open = false; cancelAnimationFrame(MG.raf); setTimeout(() => el.classList.remove("open"), 300); }
+function closeMg(){ setScene("home"); const el = $("mg"); el.classList.remove("on"); MG.open = false; cancelAnimationFrame(MG.raf); setTimeout(() => el.classList.remove("open"), 300); }
 $("mgCanvas").addEventListener("pointerdown", e => { e.preventDefault(); mgFlap(); });
 $("mgGo").addEventListener("click", () => { mgReset(); mgSetState("ready"); });
 $("mgRetry").addEventListener("click", () => { mgReset(); mgSetState("ready"); });
