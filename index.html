@@ -375,7 +375,7 @@ function unlockAudio(){   // iPhoneは最初のタップまで音を出せない
     try { ctx.createMediaElementSource(el).connect(AUD.bgmGain); } catch(e) {}
     const el2 = AUD.mgbgm = new Audio("mg-bgm.mp3"); el2.loop = true; el2.preload = "auto";   // ミニゲーム用のBGM
     try { ctx.createMediaElementSource(el2).connect(AUD.bgmGain); } catch(e) {}
-    loadSfx("jump", "sfx-jump.mp3"); loadSfx("hit", "sfx-hit.mp3");
+    loadSfx("jump", "sfx-jump2.mp3"); loadSfx("hit", "sfx-hit.mp3");
   }
   if (AUD.ctx && AUD.ctx.state === "suspended") AUD.ctx.resume();
   const cur = curBgm(); if (cur && cur.paused && !document.hidden) playBgm();
@@ -674,7 +674,7 @@ function mgHit(){
 }
 
 /* 音(ふわっとしたやさしい音) */
-function sfxFlap(){ if (playSfx("jump", .55)) return; if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.currentTime; tone(t, 420, 780, 0.1, 0.13, "sine"); noiseHit(t, 0.03, "highpass", 3200, 0.05); }
+function sfxFlap(){ if (playSfx("jump", .7)) return; if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.currentTime; tone(t, 420, 780, 0.1, 0.13, "sine"); noiseHit(t, 0.03, "highpass", 3200, 0.05); }
 function sfxScore(){ if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.currentTime; tone(t, 880, 1180, 0.1, 0.14, "sine"); tone(t + 0.07, 1320, 1330, 0.16, 0.12, "sine"); }
 function sfxHit(){ if (playSfx("hit", .8)) return; if (!AUD.ctx || AUD.sfxVol <= 0) return; const t = AUD.ctx.currentTime; noiseHit(t, 0.14, "lowpass", 900, 0.5); tone(t, 260, 70, 0.28, 0.3, "triangle"); }
 
